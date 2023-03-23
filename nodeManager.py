@@ -7,6 +7,7 @@ class NodeManager:
     nodes=[]
     edges=[]
 
+    NODE_SPACING=128
     NODE_ICON_SIZE=48
     def __init__(self,width,height):
         self.width = width
@@ -32,17 +33,19 @@ class NodeManager:
         self.edges.append(Edge(self.nodes[4],self.nodes[7],0))
     
     def add_init_node(self,name,iconPath):
-        size =self.NODE_ICON_SIZE
+        size = self.NODE_ICON_SIZE
         x= random.randrange(24,self.width-size)
         y= random.randrange(24,self.height-size)
         self.nodes.append(Node(name,iconPath,x,y))
     
     def add_node(self,name,iconPath):
-        size =self.NODE_ICON_SIZE
+        space =self.NODE_SPACING
+        size = self.NODE_ICON_SIZE
+        
         x2= random.randrange(24,self.width-size)
         y2= random.randrange(24,self.height-size)
         for node in self.nodes:
-            while (x2<=node.get_x()+size and x2>=node.get_x()-size) and (y2<=node.get_y()+size and y2>=node.get_y()-size): 
+            while (x2<=node.get_x()+space and x2>=node.get_x()-space) and (y2<=node.get_y()+space and y2>=node.get_y()-space): 
                 x2= random.randrange(24,self.width-size)
                 y2= random.randrange(24,self.height-size)
         self.nodes.append(Node(name,iconPath,x2,y2))
