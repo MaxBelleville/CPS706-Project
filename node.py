@@ -1,6 +1,7 @@
 import tkinter as tk
 class Node:
-    def __init__(self,name,iconPath,X,Y):
+    def __init__(self, id, name,iconPath,X,Y):
+        self.id = id
         self.name = name
         self.icon = tk.PhotoImage(file=iconPath)
         self.X = X
