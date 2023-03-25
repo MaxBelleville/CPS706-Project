@@ -54,8 +54,12 @@ class WindowController:
         separator = ttk.Separator(self.root,orient='horizontal',  style='TSeparator')
         separator.pack(fill='x')
         nodeManager = NodeManager(self.WIDTH,self.HEIGHT)
-        nodeManager.draw(canvas)        
+        nodeManager.draw(canvas)       
         canvas.pack()
+        graphMatrix = nodeManager.convert_matrix()
+
+        for line in graphMatrix:
+            print(line)
 
 
 if __name__ == "__main__":
