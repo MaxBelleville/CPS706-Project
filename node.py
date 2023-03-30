@@ -49,4 +49,4 @@ class Node:
 
 
     def draw_name(self,canvas):
-        canvas.create_text(self.X,self.Y+30,text=self.name, fill='red', font = ('Lucida Console',9,'bold'))
+        canvas.create_text(self.X,self.Y+30,text=self.name, fill='pink', font = ('Lucida Console',9,'bold'))
