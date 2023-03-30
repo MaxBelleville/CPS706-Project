@@ -1,0 +1,19 @@
+INSTRUCTIONS:
+Input an n by n adjacency matrix underneath the dashed line.
+Each nonzero value indicates that an edge exists and the numerical value is its weight.
+Each value must be separated by a comma.
+
+CONSTRAINTS (Error message shown if not met):
+
+- Minimum of 2 nodes
+- Number of rows and columns must be equal
+- Each value must be >= 0 and <= 9
+
+EXAMPLE:
+
+0,5,3,6,0,0
+5,0,0,4,0,2
+3,0,0,0,0,0
+6,4,0,0,0,0
+0,0,0,0,0,7
+0,2,0,0,7,0
