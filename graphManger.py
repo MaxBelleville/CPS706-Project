@@ -23,9 +23,9 @@ class GraphManager:
         nodeLines=list(filter(None,sections[0].split("\n"))) #split the node section by lines and remove empty lines from list
        
         try:
-            self.parse_nodes(nodeLines) 
-            adj_matrix=ast.literal_eval((sections[1].replace("\n",""))) #remove new line and convert string of 2d array into array
-            weight_matrix=ast.literal_eval((sections[2].replace("\n",""))) #TODO: try catch and separate into own function.
+            self.parse_nodes(nodeLines)
+            adj_matrix=ast.literal_eval((sections[1].replace("\n","").replace(" ",""))) #remove new line and convert string of 2d array into array
+            weight_matrix=ast.literal_eval((sections[2].replace("\n","").replace(" ",""))) #TODO: try catch and separate into own function.
             self.parse_matrices(adj_matrix,weight_matrix)
             dijkstra(adj_matrix, weight_matrix, 0)
             for line in weight_matrix:
