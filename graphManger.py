@@ -5,6 +5,7 @@ import re
 import ast
 from collections import defaultdict
 from tkinter import messagebox
+from algorithms.dijkstra import dijkstra
 
 class GraphManager:
     nodes=[]
@@ -26,6 +27,9 @@ class GraphManager:
             adj_matrix=ast.literal_eval((sections[1].replace("\n",""))) #remove new line and convert string of 2d array into array
             weight_matrix=ast.literal_eval((sections[2].replace("\n",""))) #TODO: try catch and separate into own function.
             self.parse_matrices(adj_matrix,weight_matrix)
+            dijkstra(adj_matrix, weight_matrix, 0)
+            for line in weight_matrix:
+                print(line)
             self.draw()
         except Exception as ex:
             messagebox.showerror("Failed to load file", ex)
