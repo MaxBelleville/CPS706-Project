@@ -27,9 +27,10 @@ class GraphManager:
             adj_matrix=ast.literal_eval((sections[1].replace("\n","").replace(" ",""))) #remove new line and convert string of 2d array into array
             weight_matrix=ast.literal_eval((sections[2].replace("\n","").replace(" ",""))) #TODO: try catch and separate into own function.
             self.parse_matrices(adj_matrix,weight_matrix)
-            dijkstra(adj_matrix, weight_matrix, 0)
-            for line in weight_matrix:
-                print(line)
+            diklist = dijkstra(adj_matrix, weight_matrix, 7, 4)
+            print(diklist)
+            for line in range(len(adj_matrix)):
+                print(line, adj_matrix[line], weight_matrix[line])
             self.draw()
         except Exception as ex:
             messagebox.showerror("Failed to load file", ex)
