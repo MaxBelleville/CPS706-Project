@@ -10,6 +10,13 @@ from algorithms.dijkstra import dijkstra
 class GraphManager:
     nodes=[]
     edges=[]
+    adjMatrix=[]
+    weightMatrix=[]
+    selectedNodes=[]
+    startNode=-1
+    endNode=-1
+    isDikstra=True
+    selectEnd=1
     nodeTypes={"computer":"./assets/computer.png","laptop":"./assets/laptop.png",
                "server":"./assets/server.png","router":"./assets/router.png"}
 
@@ -18,26 +25,25 @@ class GraphManager:
         self.height = height
 
     def add_from_file(self,path):
+        self.edges=[]
+        self.nodes=[]
         f = open(path,"r")
         sections = re.split("-+",re.sub("#.*","",f.read(),re.MULTILINE)) #Get rid of comments in text file and split by -
         nodeLines=list(filter(None,sections[0].split("\n"))) #split the node section by lines and remove empty lines from list
        
         try:
             self.parse_nodes(nodeLines)
-            adj_matrix=ast.literal_eval((sections[1].replace("\n","").replace(" ",""))) #remove new line and convert string of 2d array into array
-            weight_matrix=ast.literal_eval((sections[2].replace("\n","").replace(" ",""))) #TODO: try catch and separate into own function.
-            self.parse_matrices(adj_matrix,weight_matrix)
-            diklist = dijkstra(adj_matrix, weight_matrix, 7, 4)
-            print(diklist)
-            for line in range(len(adj_matrix)):
-                print(line, adj_matrix[line], weight_matrix[line])
+            self.adjMatrix=ast.literal_eval((sections[1].replace("\n","").replace(" ",""))) #remove new line and convert string of 2d array into array
+            self.weightMatrix=ast.literal_eval((sections[2].replace("\n","").replace(" ",""))) #TODO: try catch and separate into own function.
+            self.parse_matrices(self.adjMatrix,self.weightMatrix)
+
+            for line in range(len(self.adjMatrix)):
+                print(line, self.adjMatrix[line], self.weightMatrix[line])
             self.draw()
         except Exception as ex:
             messagebox.showerror("Failed to load file", ex)
             self.edges=[]
             self.nodes=[]
-
-
 
     def parse_nodes(self,nodeLines):
         if len(nodeLines)>=2 and len(nodeLines)<=10: #ensure certain number of nodes then parse nodes
@@ -80,11 +86,8 @@ class GraphManager:
                 if not Edge(self.nodes[val],self.nodes[key],w_mat[key][val]) in self.edges: #check if edge already exists (removes duplicates)
                     self.edges.append(newEdge)
 
-       
-
     def add_canvas(self,canvas):
         self.canvas = canvas
-
 
     def add_node(self,id,name,iconPath):
         x= random.randrange(Node.get_size(),self.width-Node.get_size())
@@ -93,15 +96,15 @@ class GraphManager:
     
     def remove_overlap(self):
         for node in self.nodes:
-            self.check_all_overlap(node)
+            self.remove_all_overlap(node)
     
             
-    def check_all_overlap(self,node):
+    def remove_all_overlap(self,node):
         noneOverlap = True
         overlapObj = self.nodes[0]
         for otherNode in self.nodes: #will loop through every node other then current node
                 if node!=otherNode:     
-                    if node.overlaps(otherNode):
+                    if node.node_overlaps(otherNode):
                         noneOverlap = False
                         overlapObj = otherNode
                         break
@@ -109,15 +112,66 @@ class GraphManager:
             x= random.randrange(Node.get_size(),self.width-Node.get_size())
             y= random.randrange(Node.get_size(),self.height-Node.get_size())
             node.set_pos(x,y)
-            self.check_all_overlap(node)
+            self.remove_all_overlap(node)
+
+    def check_overlap(self,x,y):
+        for i in range(len(self.nodes)):
+            if(self.nodes[i].overlaps(x,y)):
+                return i
+        return -1
+            
+    def set_start(self,x,y):
+        self.startNode = self.check_overlap(x,y)
+        if(self.startNode>-1): self.draw()
+    
+    def set_end(self,x,y):
+        tmp = self.check_overlap(x,y)
+        if(self.startNode!=tmp): self.endNode = tmp
+        if(self.endNode>-1): self.draw()
+
+    def initialize(self):
+        if(self.isDikstra):
+            diklist = dijkstra(self.adjMatrix, self.weightMatrix, self.startNode, self.endNode)
+            self.selectedNodes=[self.nodes[int(i)] for i in diklist[1]]
+            self.draw()
+    def set_algorithm(self,option):
+        if(option == "Dijkstra"): self.isDikstra=True
+        else:  self.isDikstra=False
+
+
+    def step(self):
+        if(self.selectEnd<len(self.selectedNodes)):self.selectEnd+=1;
+        self.draw()
+        cost=0
+        for edge in self.edges:
+             if(edge.is_connected(self.selectedNodes[:self.selectEnd])):
+                 cost+=edge.get_value()/2
+        return int(cost);
+
+    def reset(self):
+        self.endNode = -1
+        self.startNode = -1
+        self.selectEnd=1
+        self.draw()
+
+    def check_start(self):
+        return True if self.startNode>-1 else False
+    
+    def check_end(self):
+        return True if self.endNode>-1 else False
 
     def draw(self):
         self.canvas.delete("all")
+        if(self.check_start()):
+            self.nodes[self.startNode].draw_start(self.canvas)
+        if(self.check_end()):
+            self.nodes[self.endNode].draw_end(self.canvas)
+
         for node in self.nodes:
-            node.draw(self.canvas)
+            node.draw(self.canvas, self.selectedNodes[1:self.selectEnd-1])
 
         for edge in self.edges:
-            edge.draw(self.canvas)
+            edge.draw(self.canvas, self.selectedNodes[:self.selectEnd])
 
         for node in self.nodes:
             node.draw_name(self.canvas)

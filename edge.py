@@ -14,17 +14,23 @@ class Edge:
     def get_value(self):
         return self.value
     
-    def get_connected(self,selected):
-        if(selected==self.nodeA):
-            return self.nodeB
-        elif(selected==self.nodeB):
-            return self.nodeA
-        return
-
-    def draw(self,canvas):
-        canvas.create_line(self.X,self.Y,self.X2,self.Y2,width=2,fill='white')
 
     
+    def is_connected(self,selectedNode):
+        selected=False
+        for i in range(1,len(selectedNode)):
+            if(self.nodeA==selectedNode[i-1] and self.nodeB==selectedNode[i]):
+                selected=True
+                break
+            if(self.nodeB==selectedNode[i-1] and self.nodeA==selectedNode[i]):
+                selected=True
+                break
+        return selected
+
+    def draw(self,canvas,selectedNode):
+        if (self.is_connected(selectedNode)): canvas.create_line(self.X,self.Y,self.X2,self.Y2,width=2,fill='blue')
+        else: canvas.create_line(self.X,self.Y,self.X2,self.Y2,width=2,fill='white')
+
     def draw_weight(self,canvas):
         if self.value>0:
             MidX = (self.X+self.X2)/2
