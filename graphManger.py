@@ -172,7 +172,9 @@ class GraphManager:
             for i,val in enumerate(self.nodeCosts[self.iter]):
                 self.nodes[i].set_value(val)
                 if(val!=float('inf') and i!=self.startNode and i!=self.endNode): self.nodes[i].set_highlighted(True)
-           
+                if(self.iter>=len(self.nodeCosts)-1):self.nodes[i].set_highlighted(False)
+                elif(val!=float('inf') and i!=self.startNode and i!=self.endNode): self.nodes[i].set_highlighted(True)   
+        
             self.draw()
             return cost,self.iter+1
             
