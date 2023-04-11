@@ -24,7 +24,7 @@ class Edge:
     
     def draw(self,canvas):
         if (self.isHighlighted): canvas.create_line(self.X,self.Y,self.X2,self.Y2,width=2,fill='yellow')
-        elif(self.isSelected): canvas.create_line(self.X,self.Y,self.X2,self.Y2,width=2,fill='#a2d2ff')
+        elif(self.isSelected): canvas.create_line(self.X,self.Y,self.X2,self.Y2,width=2,fill='#0066ff')
         else: canvas.create_line(self.X,self.Y,self.X2,self.Y2,width=2,fill='white')
 
     def draw_weight(self,canvas):
