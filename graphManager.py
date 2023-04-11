@@ -29,9 +29,9 @@ class GraphManager:
         self.height = height
 
     def add_from_file(self,path):
-        self.edges=[]
-        self.nodes=[]
         if os.access(path, os.R_OK):
+            self.edges=[]
+            self.nodes=[]
             f = open(path,"r")
             sections = re.split("-+",re.sub("#.*","",f.read(),re.MULTILINE)) #Get rid of comments in text file and split by -
             nodeLines=list(filter(None,sections[0].split("\n"))) #split the node section by lines and remove empty lines from list
