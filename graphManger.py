@@ -106,12 +106,10 @@ class GraphManager:
             
     def remove_all_overlap(self,node):
         noneOverlap = True
-        overlapObj = self.nodes[0]
         for otherNode in self.nodes: #will loop through every node other then current node
                 if node!=otherNode:     
                     if node.node_overlaps(otherNode):
                         noneOverlap = False
-                        overlapObj = otherNode
                         break
         if noneOverlap == False:
             x= random.randrange(Node.get_size(),self.width-Node.get_size())
