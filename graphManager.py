@@ -139,7 +139,7 @@ class GraphManager:
     def initialize(self):
         if(self.isDijkstra):
             diklist = dijkstra(self.adjMatrix, self.weightMatrix, self.startNode, self.endNode)
-            self.selectedNodes=[self.nodes[int(i)] for i in diklist[1]]
+            self.selectedNodes=[self.nodes[i] for i in diklist[1]]
         else:
             extra,output = bellmanFord(self.adjMatrix,self.weightMatrix,self.startNode,self.endNode)
             self.nodeCosts=output
