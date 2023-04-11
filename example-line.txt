@@ -1,0 +1,38 @@
+#Nodes (Min 2, Maximum 10):
+#ID(numerical),Name,Type(laptop,router,server,computer ps it's purely visual)
+0,Larry's Laptop,laptop
+1,Larry's Router,router
+2,Server 1,server
+3,Router,router
+4,Server 2,server
+5,Server 3,server
+6,Router 2,router
+7,Server 4,server
+8,Sara's Router,router
+9,Sara's Laptop,computer
+
+-------------------------------------------- #Split section
+#Adjacency Matrix(like a 2d array in code):
+[0,1,0,0,0,0,0,0,0,0],
+[1,0,1,0,0,0,0,0,0,0],
+[0,1,0,1,0,0,0,0,0,0],
+[0,0,1,0,1,0,0,0,0,0],
+[0,0,0,1,0,1,0,0,0,0],
+[0,0,0,0,1,0,1,0,0,0],
+[0,0,0,0,0,1,0,1,0,0],
+[0,0,0,0,0,0,1,0,1,0],
+[0,0,0,0,0,0,0,1,0,1],
+[0,0,0,0,0,0,0,0,1,0]
+
+-------------------------------------------- #Split section
+#Weight Matrix(like a 2d array in code):
+[0,0,0,0,0,0,0,0,0,0],
+[0,0,1,0,0,0,0,0,0,0],
+[0,1,0,2,0,0,0,0,0,0],
+[0,0,2,0,3,0,0,0,0,0],
+[0,0,0,3,0,4,0,0,0,0],
+[0,0,0,0,4,0,5,0,0,0],
+[0,0,0,0,0,5,0,6,0,0],
+[0,0,0,0,0,0,6,0,7,0],
+[0,0,0,0,0,0,0,7,0,0],
+[0,0,0,0,0,0,0,0,0,0]

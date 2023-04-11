@@ -2,6 +2,7 @@ from edge import Edge
 from node import Node
 import random
 import re
+import os
 import ast
 from collections import defaultdict
 from tkinter import messagebox
@@ -30,20 +31,21 @@ class GraphManager:
     def add_from_file(self,path):
         self.edges=[]
         self.nodes=[]
-        f = open(path,"r")
-        sections = re.split("-+",re.sub("#.*","",f.read(),re.MULTILINE)) #Get rid of comments in text file and split by -
-        nodeLines=list(filter(None,sections[0].split("\n"))) #split the node section by lines and remove empty lines from list
-       
-        try:
-            self.parse_nodes(nodeLines)
-            self.adjMatrix=ast.literal_eval((sections[1].replace("\n","").replace(" ",""))) #remove new line and convert string of 2d array into array
-            self.weightMatrix=ast.literal_eval((sections[2].replace("\n","").replace(" ",""))) #TODO: try catch and separate into own function.
-            self.parse_matrices(self.adjMatrix,self.weightMatrix)
-            self.draw()
-        except Exception as ex:
-            messagebox.showerror("Failed to load file", ex)
-            self.edges=[]
-            self.nodes=[]
+        if os.access(path, os.R_OK):
+            f = open(path,"r")
+            sections = re.split("-+",re.sub("#.*","",f.read(),re.MULTILINE)) #Get rid of comments in text file and split by -
+            nodeLines=list(filter(None,sections[0].split("\n"))) #split the node section by lines and remove empty lines from list
+        
+            try:
+                self.parse_nodes(nodeLines)
+                self.adjMatrix=ast.literal_eval((sections[1].replace("\n","").replace(" ",""))) #remove new line and convert string of 2d array into array
+                self.weightMatrix=ast.literal_eval((sections[2].replace("\n","").replace(" ",""))) #TODO: try catch and separate into own function.
+                self.parse_matrices(self.adjMatrix,self.weightMatrix)
+                self.draw()
+            except Exception as ex:
+                messagebox.showerror("Failed to load file", ex)
+                self.edges=[]
+                self.nodes=[]
 
     def parse_nodes(self,nodeLines):
         if len(nodeLines)>=2 and len(nodeLines)<=10: #ensure certain number of nodes then parse nodes
@@ -171,10 +173,9 @@ class GraphManager:
                     cost= self.nodes[self.endNode].get_value()
             for i,val in enumerate(self.nodeCosts[self.iter]):
                 self.nodes[i].set_value(val)
-                if(val!=float('inf') and i!=self.startNode and i!=self.endNode): self.nodes[i].set_highlighted(True)
                 if(self.iter>=len(self.nodeCosts)-1):self.nodes[i].set_highlighted(False)
-                elif(val!=float('inf') and i!=self.startNode and i!=self.endNode): self.nodes[i].set_highlighted(True)   
-        
+                elif(val!=float('inf') and i!=self.startNode and i!=self.endNode): self.nodes[i].set_highlighted(True)
+           
             self.draw()
             return cost,self.iter+1
             

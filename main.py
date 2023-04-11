@@ -14,7 +14,7 @@ class WindowController:
     #These should be treated as constants
     WIDTH = 800
     HEIGHT = 600
-    graphManger = GraphManager(WIDTH,HEIGHT)
+    graphManager = GraphManager(WIDTH,HEIGHT)
     state = State.START
     options = [
     "Dijkstra",
@@ -33,25 +33,25 @@ class WindowController:
         self.root.geometry('+{0}+{1}'.format(event.x_root-(self.WIDTH//2), event.y_root-10))
     
     def select(self,event):
-        if(self.state==State.START): self.graphManger.set_start(event.x,event.y)
-        if(self.state==State.END): self.graphManger.set_end(event.x,event.y)
+        if(self.state==State.START): self.graphManager.set_start(event.x,event.y)
+        if(self.state==State.END): self.graphManager.set_end(event.x,event.y)
 
     def step(self):
         if(self.state==State.START):
-            if(not self.graphManger.check_start()): messagebox.showerror("Failed to place start", "Please click on one of the nodes first.")
+            if(not self.graphManager.check_start()): messagebox.showerror("Failed to place start", "Please click on one of the nodes first.")
             else: 
                 self.state = State.END
                 self.step_button.configure(text="Place End")
         elif(self.state==State.END):
-            if(not self.graphManger.check_end()): messagebox.showerror("Failed to place end", "Please click on one of the nodes first.")
+            if(not self.graphManager.check_end()): messagebox.showerror("Failed to place end", "Please click on one of the nodes first.")
             else: 
                 self.state = State.STEP
                 self.step_button.configure(text="Next Step")
-                self.graphManger.initialize()
+                self.graphManager.initialize()
                 self.distance_label.configure(text="Cost: ∞")
                 self.iteration_label.configure(text="")
         else:
-            dist,iter= self.graphManger.step()
+            dist,iter= self.graphManager.step()
             if (dist!=float("inf")): self.distance_label.configure(text="Cost: "+ str(dist))
             if(iter>0): self.iteration_label.configure(text="Iter: "+ str(iter))
 
@@ -66,7 +66,7 @@ class WindowController:
             initialdir='./',
             filetypes=filetypes)
         
-        self.graphManger.add_from_file(filename)
+        self.graphManager.add_from_file(filename)
 
     def get_size(self):
         return self.WIDTH,self.HEIGHT
@@ -84,11 +84,11 @@ class WindowController:
         self.distance_label.configure(text="")
         self.iteration_label.configure(text="")
         self.state = State.START
-        self.graphManger.reset()
+        self.graphManager.reset()
 
     def option_changed(self,selected):
         self.reset()
-        self.graphManger.set_algorithm(selected)
+        self.graphManager.set_algorithm(selected)
 
     def createWindow(self):
         self.root.attributes('-topmost', 1)
@@ -98,7 +98,7 @@ class WindowController:
   
         canvas = tk.Canvas(self.root,width=self.WIDTH,height=self.HEIGHT, bd=0, highlightthickness=0, bg='black')
         canvas.bind("<Button-1>", self.select)
-        self.graphManger.add_canvas(canvas)
+        self.graphManager.add_canvas(canvas)
 
         title_bar = tk.Frame(self.root, bg='#111')
         title_bar.pack(fill=tk.X)
@@ -120,7 +120,7 @@ class WindowController:
         bottom_bar = tk.Frame(self.root, bg='black')
         bottom_bar.pack(fill=tk.X)
         self.interactables(bottom_bar)
-        self.graphManger.add_from_file("./example.txt")
+        self.graphManager.add_from_file("./example.txt")
 
     def interactables(self,bottom_bar):
         clicked = tk.StringVar(self.root)
