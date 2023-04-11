@@ -49,10 +49,12 @@ class WindowController:
                 self.state = State.STEP
                 self.step_button.configure(text="Next Step")
                 self.graphManger.initialize()
-                self.distance_label.configure(text="Cost: 0")
+                self.distance_label.configure(text="Cost: ∞")
+                self.iteration_label.configure(text="")
         else:
-            dist= self.graphManger.step()
-            self.distance_label.configure(text="Cost: "+ str(dist))
+            dist,iter= self.graphManger.step()
+            if (dist!=float("inf")): self.distance_label.configure(text="Cost: "+ str(dist))
+            if(iter>0): self.iteration_label.configure(text="Iter: "+ str(iter))
 
     def select_file(self):
         filetypes = (
@@ -75,7 +77,7 @@ class WindowController:
         screen_height = self.root.winfo_screenheight()
         center_x = int(screen_width/2 - self.WIDTH / 2)
         center_y = int(screen_height/2 - self.HEIGHT / 2)
-        self.root.geometry(f'{self.WIDTH}x{self.HEIGHT+100}+{center_x}+{center_y-50}')
+        self.root.geometry(f'{self.WIDTH+50}x{self.HEIGHT+100}+{center_x}+{center_y-50}')
         self.root.resizable(False, False)
     
     def reset(self):
@@ -128,26 +130,29 @@ class WindowController:
         drop = tk.OptionMenu(bottom_bar, clicked, *self.options,command=self.option_changed )
         drop.configure(fg="white", bg="#111",font=self.font,activebackground="#111",activeforeground="white" )
         drop['menu'].configure(fg='white',bg="#111")
-        drop.pack(side=tk.LEFT,padx=25)
+        drop.pack(side=tk.LEFT,padx=20)
 
         
         reset_button = tk.Button(bottom_bar, text='Reset', bg='#111',fg='white',font=self.font, command=self.reset)
         reset_button.bind('<Enter>', lambda e: reset_button.configure(bg='darkred'))
         reset_button.bind('<Leave>', lambda e: reset_button.configure(bg='#111'))
-        reset_button.pack(side=tk.RIGHT,padx=20)
+        reset_button.pack(side=tk.RIGHT,padx=15)
 
         self.step_button = tk.Button(bottom_bar, text='Place Start', bg='#111',fg='white',font=self.font, command=self.step)
         self.step_button.bind('<Enter>', lambda e: self.step_button.configure(bg='darkgreen'))
         self.step_button.bind('<Leave>', lambda e: self.step_button.configure(bg='#111'))
-        self.step_button.pack(side=tk.RIGHT,padx=20)   
+        self.step_button.pack(side=tk.RIGHT,padx=15)   
 
         open_file = tk.Button(bottom_bar, text='Open File', bg='#111',fg='white',font=self.font, command=self.select_file)
         open_file.bind('<Enter>', lambda e: open_file.configure(bg='darkblue'))
         open_file.bind('<Leave>', lambda e: open_file.configure(bg='#111'))
-        open_file.pack(side=tk.RIGHT,padx=20)
+        open_file.pack(side=tk.RIGHT,padx=15)
 
-        self.distance_label = tk.Label(bottom_bar, bg='#111',fg='white',font=self.font, text="")
-        self.distance_label.pack(side=tk.RIGHT, padx=20)
+        self.distance_label = tk.Label(bottom_bar, bg='black',fg='white',font=self.font, text="")
+        self.distance_label.pack(side=tk.RIGHT, padx=15)
+
+        self.iteration_label = tk.Label(bottom_bar, bg='black',fg='white',font=self.font, text="")
+        self.iteration_label.pack(side=tk.RIGHT, padx=15)
 
 
 if __name__ == "__main__":

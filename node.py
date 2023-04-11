@@ -9,7 +9,10 @@ class Node:
         self.icon = tk.PhotoImage(file=iconPath)
         self.X = X
         self.Y = Y
-
+        self.value = float("inf")
+        self.isSelected=False
+        self.isHighlighted=False
+      
     def get_x(self):
         return self.X
     
@@ -24,6 +27,11 @@ class Node:
     def get_size():
         return Node.NODE_ICON_SIZE
 
+    def set_value(self,value):
+        self.value=value
+
+    def get_value(self):
+        return self.value
 
     def set_pos(self,x,y):
         self.X,self.Y=x,y
@@ -49,24 +57,32 @@ class Node:
         angle = dotProduct/vectorMod
         return math.degrees(math.acos(angle))
         
+    def set_highlighted(self,isHighlighted):
+        self.isHighlighted = isHighlighted
     
-    def draw(self,canvas,selectedNodes):
-        for selected in selectedNodes:
-            if (self == selected):
-                self.draw_inbetween(canvas)
+    def set_selected(self,isSelected):
+        self.isSelected = isSelected
+
+    def draw(self,canvas):
+        space = self.NODE_ICON_SIZE
+        if(self.isSelected): canvas.create_oval(self.X-space,self.Y-space,self.X+space,self.Y+space, fill="darkblue")
+        elif(self.isHighlighted): canvas.create_oval(self.X-space,self.Y-space,self.X+space,self.Y+space, fill="#221C35")
         canvas.create_image(self.X,self.Y, image = self.icon)
 
     def draw_start(self,canvas):
         space = self.NODE_ICON_SIZE
         canvas.create_oval(self.X-space,self.Y-space,self.X+space,self.Y+space, fill="darkgreen")
 
-    def draw_inbetween(self,canvas):
-        space = self.NODE_ICON_SIZE
-        canvas.create_oval(self.X-space,self.Y-space,self.X+space,self.Y+space, fill="darkblue")
     
     def draw_end(self,canvas):
         space = self.NODE_ICON_SIZE
         canvas.create_oval(self.X-space,self.Y-space,self.X+space,self.Y+space, fill="darkred")
 
-    def draw_name(self,canvas):
-        canvas.create_text(self.X,self.Y+30,text=self.name, fill='pink', font = ('Lucida Console',9,'bold'))
+    def draw_extras(self,canvas,isDijkstra):
+        canvas.create_text(self.X,self.Y-30,text=self.name, fill='pink3', font = ('Lucida Console',9,'bold'))
+        if(not isDijkstra):
+            canvas.create_oval(self.X-10,self.Y-10,self.X+8,self.Y+8,fill='black')    
+            if (self.value == float("inf")):   
+                canvas.create_text(self.X,self.Y,text="∞", fill='bisque', font = ('Lucida Console',12,'bold'))
+            else:
+                canvas.create_text(self.X,self.Y,text=self.value, fill='white', font = ('Lucida Console',10,'bold'))

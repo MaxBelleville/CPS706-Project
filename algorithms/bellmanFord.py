@@ -1,5 +1,5 @@
 def bellmanFord(adj_matrix, weight_matrix, start, end):
-    maxVal = 2147483647
+    maxVal = float("inf")
     numNodes = len(adj_matrix)
     edges = []
 
@@ -51,6 +51,7 @@ def bellmanFord(adj_matrix, weight_matrix, start, end):
 
     # ---START OF MAIN ALGORITHM---
 
+    costAtEachIter = []
     for n in range(numNodes - 1):   # Bellman-Ford algorithm loops numNodes - 1 times; n is not used
         # Loop through number of nodes (length of matrix)
         for i in range(numNodes):
@@ -72,7 +73,12 @@ def bellmanFord(adj_matrix, weight_matrix, start, end):
                 temp[j] = [propagationTable[i][j][0],
                            str(propagationTable[i][j][1])]
             bellmanFordTable[i] = temp.copy()
+        #print('ITERATION ' + str(n) + ':\n' + str(bellmanFordTable) + '\n')
+
+        costAtEachIter.append([])
+        for x in range(numNodes):
+            costAtEachIter[n].append(bellmanFordTable[start][x][0])
 
     # ---END OF MAIN ALGORITHM---
-
-    return bellmanFordTable[start][end]
+    #print('COSTS:\n', costAtEachIter)
+    return bellmanFordTable[start][end], costAtEachIter

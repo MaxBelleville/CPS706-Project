@@ -6,6 +6,7 @@ import ast
 from collections import defaultdict
 from tkinter import messagebox
 from algorithms.dijkstra import dijkstra
+from algorithms.bellmanFord import bellmanFord
 
 class GraphManager:
     nodes=[]
@@ -13,10 +14,12 @@ class GraphManager:
     adjMatrix=[]
     weightMatrix=[]
     selectedNodes=[]
+    nodeCosts=[]
     startNode=-1
     endNode=-1
-    isDikstra=True
+    isDijkstra=True
     selectEnd=1
+    iter=-1
     nodeTypes={"computer":"./assets/computer.png","laptop":"./assets/laptop.png",
                "server":"./assets/server.png","router":"./assets/router.png"}
 
@@ -36,9 +39,6 @@ class GraphManager:
             self.adjMatrix=ast.literal_eval((sections[1].replace("\n","").replace(" ",""))) #remove new line and convert string of 2d array into array
             self.weightMatrix=ast.literal_eval((sections[2].replace("\n","").replace(" ",""))) #TODO: try catch and separate into own function.
             self.parse_matrices(self.adjMatrix,self.weightMatrix)
-
-            for line in range(len(self.adjMatrix)):
-                print(line, self.adjMatrix[line], self.weightMatrix[line])
             self.draw()
         except Exception as ex:
             messagebox.showerror("Failed to load file", ex)
@@ -72,6 +72,11 @@ class GraphManager:
                 a_list = defaultdict(list)
                 for y in range(len(a_mat)):
                     for x in range(len(a_mat)):
+                        if a_mat[x][y] == 0 and w_mat[x][y]>0: 
+                            raise Exception("Weight missing edge connection", "The adjacency matrix at "+ str(x) + ","+ str(y) + 
+                                            " is empty whereas weight matrix is has a value")
+                        if w_mat[x][y]>9:
+                            raise Exception("Weight is to large", "For simplicities sake on the input weights can only be 0 to 9")
                         if a_mat[x][y] != a_mat[y][x]: 
                             raise Exception("Adjacency Matrix Symmetry Error\nDifference between value at " + str(y) + ","+ str(x)+ ": "+str(a_mat[y][x])+
                                             " and " + str(x) + ","+ str(y)+ ": "+str(a_mat[x][y]))
@@ -122,6 +127,8 @@ class GraphManager:
             
     def set_start(self,x,y):
         self.startNode = self.check_overlap(x,y)
+        self.reset_node_value()
+        if(self.startNode>-1 and not self.isDijkstra): self.nodes[self.startNode].set_value(0)
         if(self.startNode>-1): self.draw()
     
     def set_end(self,x,y):
@@ -130,28 +137,66 @@ class GraphManager:
         if(self.endNode>-1): self.draw()
 
     def initialize(self):
-        if(self.isDikstra):
+        if(self.isDijkstra):
             diklist = dijkstra(self.adjMatrix, self.weightMatrix, self.startNode, self.endNode)
             self.selectedNodes=[self.nodes[int(i)] for i in diklist[1]]
-            self.draw()
+        else:
+            extra,output = bellmanFord(self.adjMatrix,self.weightMatrix,self.startNode,self.endNode)
+            self.nodeCosts=output
+            self.selectedNodes=[self.nodes[int(i)] for i in extra[1]]
+        self.draw()
+
     def set_algorithm(self,option):
-        if(option == "Dijkstra"): self.isDikstra=True
-        else:  self.isDikstra=False
+        if(option == "Dijkstra"): self.isDijkstra=True
+        else:  self.isDijkstra=False
+        self.draw()
 
 
     def step(self):
-        if(self.selectEnd<len(self.selectedNodes)):self.selectEnd+=1;
-        self.draw()
-        cost=0
-        for edge in self.edges:
-             if(edge.is_connected(self.selectedNodes[:self.selectEnd])):
-                 cost+=edge.get_value()/2
-        return int(cost);
+        if(self.isDijkstra):
+            if(self.selectEnd<len(self.selectedNodes)):self.selectEnd+=1;
+            if len(self.selectedNodes)==0: return float("inf"),0
+            self.draw()
+            cost=0
+            for edge in self.edges:
+                connected,isLast= self.is_dijkstra_connected(edge,self.selectedNodes[:self.selectEnd])
+                if(connected):
+                    cost+=edge.get_value()/2
+            return int(cost),0
+        else:
+            cost = float('inf')
+            if(self.iter<len(self.nodeCosts)-1): self.iter+=1
+            if(self.iter>=len(self.nodeCosts)-1):
+                self.selectEnd=len(self.selectedNodes)
+                self.draw()
+                if(self.check_end()):
+                    cost= self.nodes[self.endNode].get_value()
+            for i,val in enumerate(self.nodeCosts[self.iter]):
+                self.nodes[i].set_value(val)
+                if(val!=float('inf') and i!=self.startNode and i!=self.endNode): self.nodes[i].set_highlighted(True)
+           
+            self.draw()
+            return cost,self.iter+1
+            
+
+
+    def reset_node_value(self):
+        for node in self.nodes:
+             node.set_selected(False)
+             node.set_highlighted(False)
+             if (not self.isDijkstra):
+                node.set_value(float("inf"))
 
     def reset(self):
         self.endNode = -1
+        self.reset_node_value()
+        for edge in self.edges:
+             edge.set_selected(False)
+             edge.set_highlighted(False)
         self.startNode = -1
+        self.iter=-1
         self.selectEnd=1
+       
         self.draw()
 
     def check_start(self):
@@ -159,6 +204,19 @@ class GraphManager:
     
     def check_end(self):
         return True if self.endNode>-1 else False
+
+    def is_dijkstra_connected(self,edge,selectedNode):
+        connected=False
+        isLast=False
+        for i in range(1,len(selectedNode)):
+            if(i==len(selectedNode)-1): isLast=True
+            if(edge.nodeA==selectedNode[i-1] and edge.nodeB==selectedNode[i]):
+                connected=True
+                break
+            if(edge.nodeB==selectedNode[i-1] and edge.nodeA==selectedNode[i]):
+                connected=True
+                break
+        return  connected,isLast
 
     def draw(self):
         self.canvas.delete("all")
@@ -168,13 +226,21 @@ class GraphManager:
             self.nodes[self.endNode].draw_end(self.canvas)
 
         for node in self.nodes:
-            node.draw(self.canvas, self.selectedNodes[1:self.selectEnd-1])
+            for selected in self.selectedNodes[1:self.selectEnd-1]:
+                if(node == selected):
+                    node.set_selected(True)
+            node.draw(self.canvas)
 
         for edge in self.edges:
-            edge.draw(self.canvas, self.selectedNodes[:self.selectEnd])
+            connected,isLast = self.is_dijkstra_connected(edge,self.selectedNodes[:self.selectEnd])
+            if(connected and isLast): edge.set_highlighted(True)
+            elif(connected): 
+                edge.set_selected(True)
+                edge.set_highlighted(False)
+            edge.draw(self.canvas)
 
         for node in self.nodes:
-            node.draw_name(self.canvas)
+            node.draw_extras(self.canvas,self.isDijkstra)
 
         for edge in self.edges:
             edge.draw_weight(self.canvas)

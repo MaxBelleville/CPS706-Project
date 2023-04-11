@@ -1,12 +1,12 @@
 def dijkstra(adj_matrix, weight_matrix, start_node, end_node):
         nodeNum = len(adj_matrix)
         visited = [False]*nodeNum
-        distance = [1e7]*nodeNum
+        distance = [float("inf")]*nodeNum
         paths = ['']*nodeNum
         distance[start_node] = 0
 
         for i in range(nodeNum):
-            min_distance = 1e7
+            min_distance = float("inf")
             for j in range(nodeNum):
                 if not visited[j] and distance[j] < min_distance:
                     min_distance = distance[j]
