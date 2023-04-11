@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import math
-from graphManger import GraphManager
+from graphManager import GraphManager
 from tkinter import filedialog as fd
 from enum import Enum
 from tkinter import messagebox
@@ -19,7 +18,7 @@ class WindowController:
     state = State.START
     options = [
     "Dijkstra",
-    "Bellman-ford",
+    "Bellman-Ford",
     ]
     font = ('Lucida Console',14)
 
@@ -83,6 +82,7 @@ class WindowController:
     def reset(self):
         self.step_button.configure(text="Place Start")
         self.distance_label.configure(text="")
+        self.iteration_label.configure(text="")
         self.state = State.START
         self.graphManger.reset()
 
